@@ -51,7 +51,12 @@ app.get('/roll', function(request, response) {
     var parsedRoll = parseRoll(roll);
     var result = rollDie(parsedRoll.count, parsedRoll.die, parsedRoll.add);
     
-    response.send(roll + ': ' + result.total + ' (' + result.rolls.join(', ') + ')');
+    var text = roll + ': ' + result.total;
+    if (result.rolls.length > 1) {
+      text += ' (' + result.rolls.join(', ') + ')';
+    }
+    
+    response.send(text);
   }
   else {
     response.sendStatus(400);
@@ -64,7 +69,11 @@ app.get('/roll/slack', function(request, response) {
     var parsedRoll = parseRoll(roll);
     var result = rollDie(parsedRoll.count, parsedRoll.die, parsedRoll.add);
     
-    var text = roll + ': ' + result.total + ' (' + result.rolls.join(', ') + ')';
+    var text = roll + ': ' + result.total;
+    if (result.rolls.length > 1) {
+      text += ' (' + result.rolls.join(', ') + ')';
+    }
+    
     response.json({
       'response_type': 'in_channel',
       'text': text
