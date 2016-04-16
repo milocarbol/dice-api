@@ -15,7 +15,7 @@ function rollDie(count, die, add) {
     total += roll;
   }
   rolls['total'] = total+add;
-  return {'rolls': rolls, 'total': total};
+  return {'rolls': rolls, 'total': total + add};
 }
 
 function parseRoll(roll) {
