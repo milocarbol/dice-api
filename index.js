@@ -32,8 +32,8 @@ function parseRoll(roll) {
 
 app.set('port', (process.env.PORT || 5000));
 
-app.get('/roll', function(request, response) {
-  var roll = request.query.roll;
+app.get('/roll/json', function(request, response) {
+  var roll = request.query.text;
   if (notation.test(roll)) {
     var parsedRoll = parseRoll(roll);
     var result = rollDie(parsedRoll.count, parsedRoll.die, parsedRoll.add);
@@ -46,7 +46,7 @@ app.get('/roll', function(request, response) {
   }
 });
 
-app.get('/slackroll', function(request, response) {
+app.get('/roll', function(request, response) {
   var roll = request.query.text;
   if (notation.test(roll)) {
     var parsedRoll = parseRoll(roll);
