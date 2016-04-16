@@ -1,0 +1,7 @@
+{
+  "name": "Dice API",
+  "description": "An API that rolls dice",
+  "repository": "https://github.com/milocarbol/dice-api",
+  "keywords": ["dice"],
+  "image": "heroku/nodejs"
+}
