@@ -51,7 +51,7 @@ app.get('/roll', function(request, response) {
     var parsedRoll = parseRoll(roll);
     var result = rollDie(parsedRoll.count, parsedRoll.die, parsedRoll.add);
     
-    response.json(parsedRoll.count + 'd' + parsedRoll.die + '+' + parsedRoll.add + ': ' + result.total + ' (' + result.rolls.join(', ') + ')');
+    response.send(parsedRoll.count + 'd' + parsedRoll.die + '+' + parsedRoll.add + ': ' + result.total + ' (' + result.rolls.join(', ') + ')');
   }
   else {
     response.sendStatus(400);
