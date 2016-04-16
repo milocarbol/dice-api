@@ -38,7 +38,6 @@ app.get('/roll/json', function(request, response) {
     var parsedRoll = parseRoll(roll);
     var result = rollDie(parsedRoll.count, parsedRoll.die, parsedRoll.add);
     
-    console.log('Returning result: ' + JSON.stringify(result));
     response.json(result);
   }
   else {
@@ -52,8 +51,24 @@ app.get('/roll', function(request, response) {
     var parsedRoll = parseRoll(roll);
     var result = rollDie(parsedRoll.count, parsedRoll.die, parsedRoll.add);
     
-    var rolls = '(' + result.rolls.join(', ') + ')';
-    response.send(parsedRoll.count + 'd' + parsedRoll.die + '+' + parsedRoll.add + ': ' + result.total + ' (' + result.rolls.join(', ') + ')');
+    response.json(parsedRoll.count + 'd' + parsedRoll.die + '+' + parsedRoll.add + ': ' + result.total + ' (' + result.rolls.join(', ') + ')');
+  }
+  else {
+    response.sendStatus(400);
+  }
+});
+
+app.get('/roll/slack', function(request, response) {
+  var roll = request.query.text;
+  if (notation.test(roll)) {
+    var parsedRoll = parseRoll(roll);
+    var result = rollDie(parsedRoll.count, parsedRoll.die, parsedRoll.add);
+    
+    var text = parsedRoll.count + 'd' + parsedRoll.die + '+' + parsedRoll.add + ': ' + result.total + ' (' + result.rolls.join(', ') + ')';
+    response.json({
+      'response_type': 'in_channel',
+      'text': text
+    });
   }
   else {
     response.sendStatus(400);
