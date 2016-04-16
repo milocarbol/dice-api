@@ -7,15 +7,15 @@ var notation = /^\d*d\d+(\+\d+)?$/
 function rollDie(count, die, add) {
   console.log('Rolling ' + count + 'd' + die + '+' + add);
   
-  var rolls = {};
+  var rolls = [];
   var total = 0;
   for (i = 0; i < count; i++) {
     var roll = Math.floor(Math.random() * die) + 1;
-    rolls['die' + (i+1)] = roll;
+    rolls.push(roll);
     total += roll;
   }
   rolls['total'] = total+add;
-  return rolls;
+  return {'rolls': rolls, 'total': total};
 }
 
 function parseRoll(roll) {
@@ -51,7 +51,9 @@ app.get('/slackroll', function(request, response) {
   if (notation.test(roll)) {
     var parsedRoll = parseRoll(roll);
     var result = rollDie(parsedRoll.count, parsedRoll.die, parsedRoll.add);
-    response.send(result.count + 'd' + result.die + '+' + result.add + ': ' + result.total);
+    
+    var rolls = '(' + result.rolls.join(', ') + ')';
+    response.send(parsedRoll.count + 'd' + parsedRoll.die + '+' + parsedRoll.add + ': ' + result.total + '(' + result.rolls.join(', ') + ')');
   }
   else {
     response.sendStatus(400);
