@@ -71,7 +71,10 @@ app.get('/roll/slack', function(request, response) {
     });
   }
   else {
-    response.sendStatus(400);
+    response.json({
+      'response_type': 'in_channel',
+      'text': '"' + request.query.text + '" is not valid dice notation.'
+    });
   }
 });
 
