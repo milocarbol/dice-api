@@ -1,3 +1,4 @@
+var https = require('https');
 var express = require('express');
 var app = express();
 
@@ -39,6 +40,18 @@ app.get('/roll', function(request, response) {
     
     console.log('Returning result: ' + JSON.stringify(result));
     response.json(result);
+  }
+  else {
+    response.sendStatus(400);
+  }
+});
+
+app.get('/slackroll', function(request, response) {
+  var roll = request.query.text;
+  if (notation.test(roll)) {
+    var parsedRoll = parseRoll(roll);
+    var result = rollDie(parsedRoll.count, parsedRoll.die, parsedRoll.add);
+    response.send(result.count + 'd' + result.die + '+' + result.add + ': ' + result.total);
   }
   else {
     response.sendStatus(400);
