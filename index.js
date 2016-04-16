@@ -53,7 +53,7 @@ app.get('/slackroll', function(request, response) {
     var result = rollDie(parsedRoll.count, parsedRoll.die, parsedRoll.add);
     
     var rolls = '(' + result.rolls.join(', ') + ')';
-    response.send(parsedRoll.count + 'd' + parsedRoll.die + '+' + parsedRoll.add + ': ' + result.total + '(' + result.rolls.join(', ') + ')');
+    response.send(parsedRoll.count + 'd' + parsedRoll.die + '+' + parsedRoll.add + ': ' + result.total + ' (' + result.rolls.join(', ') + ')');
   }
   else {
     response.sendStatus(400);
