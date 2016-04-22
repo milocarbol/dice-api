@@ -1,4 +1,3 @@
-var https = require('https');
 var constants = require('./constants.js');
 
 var dice = {
@@ -8,7 +7,7 @@ var dice = {
   
     var rolls = [];
     var total = 0;
-    for (i = 0; i < count; i++) {
+    for (var i = 0; i < count; i++) {
       var roll = Math.floor(Math.random() * die) + 1;
       rolls.push(roll);
       total += roll;
