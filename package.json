@@ -1,7 +1,7 @@
 {
-  "name": "dice-api",
+  "name": "rpg-api",
   "version": "0.1.5",
-  "description": "An API that rolls dice",
+  "description": "An API that does RPG things",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
@@ -15,7 +15,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/milocarbol/dice-api"
+    "url": "https://github.com/milocarbol/rpg-api"
   },
   "keywords": [
     "dice"

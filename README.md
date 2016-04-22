@@ -1,6 +1,6 @@
-# Dice API
+# RPG API
 
-This rolls dice. It's cool.
+This does RPG things. It's cool.
 
 ## Running Locally
 
@@ -15,4 +15,5 @@ It's now running on [localhost:5000](http://localhost:5000/).
 
 ## Integrating with Slack
 
+### Dice API
 Add a new "slash command" that makes a GET request to &lt;your server&gt;/roll/slack. Done. Example: "/roll 1d20+5"

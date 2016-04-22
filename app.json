@@ -1,7 +1,7 @@
 {
-  "name": "Dice API",
-  "description": "An API that rolls dice",
-  "repository": "https://github.com/milocarbol/dice-api",
-  "keywords": ["dice"],
+  "name": "RPG API",
+  "description": "An API that does RPG things",
+  "repository": "https://github.com/milocarbol/rpg-api",
+  "keywords": ["rpg"],
   "image": "heroku/nodejs"
 }
