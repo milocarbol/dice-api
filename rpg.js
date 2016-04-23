@@ -111,6 +111,7 @@ var rpg = {
     }
     
     this.addTo(args, addTo);
+    this.initiativeOrder = []
     
     switch (respondWith) {
     case constants.respondWithJson:
@@ -164,6 +165,8 @@ var rpg = {
       console.log('Clearing monsters');
       this.monsters = [];
     }
+    
+    this.initiativeOrder = []
     
     switch (respondWith) {
     case constants.respondWithJson:
