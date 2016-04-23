@@ -2,28 +2,58 @@ var constants = require('./constants.js');
 
 var rpg = {
   party: [],
-  iniativeOrder : [],
-  currentTurn : 0,
-  initiativeRolled: false,
+  monsters: [],
+  initiativeOrder : [],
   
-  cmdGetParty : 'getparty',
-  cmdAddParty : 'addparty',
-  cmdClrParty : 'clearparty',
+  cmdAddParty : 'addplayers',
+  cmdGetParty : 'getplayers',
+  cmdAddMonsters : 'addmonsters',
+  cmdGetMonsters : 'getmonsters',
+  cmdClearParty : 'clearparty',
+  cmdClearMonsters : 'clearmonsters',
   cmdRollInit : 'rollinit',
-  cmdNextTurn : 'next',
+  cmdGetInit : 'getinit',
   
   parseText : function(text) {
     return text.split(' ');
   },
   
-  addToParty : function(args) {
-    this.currentTurn = 0;
-    this.initiativeRolled = false;
-    
+  getCharactersAsString : function(characters) {
+    var text = '';
+    for (var i = 0; i < characters.length; i++) {
+      var character = characters[i];
+      text += character.name + ' (';
+      if (character.initiativeBonus >= 0) {
+        text += '+' + character.initiativeBonus;
+      }
+      else {
+        text += character.initiativeBonus;
+      }
+      text += ')';
+      if (i < characters.length - 1) {
+        text += ', ';
+      }
+    }
+    return text;
+  },
+  
+  getInitiativeOrderAsString : function() {
+    var text = '';
+    for (var i = 0; i < this.initiativeOrder.length; i++) {
+      var player = this.initiativeOrder[i];
+      text += player.name + ' (' + player.initiative + ')';
+      if (i < this.initiativeOrder.length - 1) {
+        text += ', ';
+      }
+    }
+    return text;
+  },
+  
+  addTo : function(args, addTo) {
     for (var i = 0; i < args.length; i+=2) {
       if (!isNaN(parseInt(args[i+1]))) {
         console.log('Adding ' + args[i] + ' with initiative bonus of ' + args[i+1]);
-        this.party.push({
+        addTo.push({
           'name': args[i],
           'initiativeBonus': parseInt(args[i+1])
         });
@@ -32,29 +62,9 @@ var rpg = {
         console.log('Can\'t add ' + args[i] + ' with initiative bonus of ' + args[i+1]);
       }
     }
-    return true;
   },
   
-  getPartyAsString : function() {
-    var text = '';
-    for (var i = 0; i < this.party.length; i++) {
-      var player = this.party[i];
-      text += player.name + ' (';
-      if (player.initiativeBonus >= 0) {
-        text += '+' + player.initiativeBonus;
-      }
-      else {
-        text += player.initiativeBonus;
-      }
-      text += ')';
-      if (i < this.party.length - 1) {
-        text += ', ';
-      }
-    }
-    return text;
-  },
-  
-  rollInitiativeForPlayer : function(player) {
+  rollInitiativeForCharacter : function(player) {
     return {
       'name': player.name,
       'initiative': Math.floor(Math.random() * 20) + 1 + player.initiativeBonus,
@@ -63,10 +73,9 @@ var rpg = {
   },
   
   rollInitiative : function() {
-    this.currentTurn = 0;
-    this.initiativeRolled = true;
+    var all = this.party.concat(this.monsters);
     
-    this.initiativeOrder = this.party.map(this.rollInitiativeForPlayer);
+    this.initiativeOrder = all.map(this.rollInitiativeForCharacter);
     this.initiativeOrder.sort(function (a, b) {
       if (a.initiative > b.initiative) {
         return -1;
@@ -90,122 +99,143 @@ var rpg = {
     console.log('Initiative order: ' + JSON.stringify(this.initiativeOrder));
   },
   
-  nextTurn : function() {
-    if (this.initiativeRolled) {
-      this.currentTurn++;
-      
-      if (this.currentTurn < this.initiativeOrder.length) {
-        return this.initiativeOrder[this.currentTurn-1];
-      }
-      else {
-        this.currentTurn = 0;
-        return this.initiativeOrder[this.initiativeOrder.length-1];
-      }
+  handleAdd : function(isParty, args, response, respondWith) {
+    var addTo = [];
+    if (isParty) {
+      console.log('Adding players: ' + args);
+      addTo = this.party;
     }
     else {
-      return null;
+      console.log('Adding monsters: ' + args);
+      addTo = this.monsters;
     }
-  },
-  
-  handleAddToParty : function(args, response, respondWith) {
-    console.log('Adding to party: ' + args);
     
-    this.addToParty(args);
+    this.addTo(args, addTo);
     
     switch (respondWith) {
     case constants.respondWithJson:
-      response.json(this.party);
+      response.json(addTo);
       break;
     case constants.respondWithText:
-      response.send(this.getPartyAsString());
+      response.send(this.getCharactersAsString(addTo));
       break;
     case constants.respondToSlack:
       response.json({
         'response_type': 'in_channel',
-        'text': this.getPartyAsString()
+        'text': this.getCharactersAsString(addTo)
       });
       break;
     }
   },
   
-  handleGetParty : function(response, respondWith) {
-    console.log('Getting party');
+  handleGet : function(isParty, response, respondWith) {
+    var getFrom = [];
+    if (isParty) {
+      console.log('Getting players');
+      getFrom = this.party;
+    }
+    else {
+      console.log('Getting monsters');
+      getFrom = this.monsters;
+    }
     
     switch (respondWith) {
     case constants.respondWithJson:
-      response.json(this.party);
+      response.json(getFrom);
       break;
     case constants.respondWithText:
-      response.send(this.getPartyAsString());
+      response.send(this.getCharactersAsString(getFrom));
       break;
     case constants.respondToSlack:
       response.json({
         'response_type': 'in_channel',
-        'text': this.getPartyAsString()
+        'text': this.getCharactersAsString(getFrom)
       });
       break;
     }
   },
   
-  handleClearParty : function(response, respondWith) {
-    console.log('Clearing party');
-    
-    this.party = [];
+  handleClear : function(isParty, response, respondWith) {
+    if (isParty) {
+      console.log('Clearing players');
+      this.party = [];
+    }
+    else {
+      console.log('Clearing monsters');
+      this.monsters = [];
+    }
     
     switch (respondWith) {
     case constants.respondWithJson:
-      response.json(this.party);
+      response.json([]);
       break;
     case constants.respondWithText:
-      response.sendStatus(200);
+      response.sendStatus('Cleared.');
       break;
     case constants.respondToSlack:
       response.json({
         'response_type': 'in_channel',
-        'text': 'Party cleared.'
+        'text': 'Cleared.'
       });
       break;
     }
   },
   
-  handleInitiative : function(roll, response, respondWith, friendlyError) {
-    if (roll) {
+  handleRollInitiative : function(response, respondWith, friendlyError) {
+    if (this.party.length > 0) {
       console.log('Rolling initiative');
       this.rollInitiative();
-    }
-    
-    console.log('Getting next player');
-    
-    var nextPlayer = this.nextTurn();
-    if (nextPlayer) {
-      console.log(nextPlayer.name + ' is next');
+      
+      var player = this.initiativeOrder[0];
+      console.log(player.name + ' is first');
       switch (respondWith) {
       case constants.respondWithJson:
-        response.json({
-          'name': nextPlayer.name
-        });
+        response.json(this.initiativeOrder);
         break;
       case constants.respondWithText:
-        response.send('Next: ' + nextPlayer.name);
+        response.send('First: ' + player.name);
         break;
       case constants.respondToSlack:
         response.json({
           'response_type': 'in_channel',
-          'text': 'Next: ' + nextPlayer.name
+          'text': 'First: ' + player.name
         });
         break;
       }
     }
     else {
       if (friendlyError) {
-        if (roll) {
-          console.log('There\'s no party!');
-          response.send('There\'s no party!');
-        }
-        else {
-          console.log('Initiative hasn\'t been rolled');
-          response.send('Initiative hasn\'t been rolled');
-        }
+        console.log('There\'s no party!');
+        response.send('There\'s no party!');
+      }
+      else {
+        response.sendStatus(400);
+      }
+    }
+  },
+  
+  handleGetInitiative : function(response, respondWith, friendlyError) {
+    if (this.initiativeOrder.length > 0) {
+      console.log('Returning initiative');
+      switch (respondWith) {
+      case constants.respondWithJson:
+        response.json(this.initiativeOrder);
+        break;
+      case constants.respondWithText:
+        response.send(this.getInitiativeOrderAsString());
+        break;
+      case constants.respondToSlack:
+        response.json({
+          'response_type': 'in_channel',
+          'text': this.getInitiativeOrderAsString()
+        });
+        break;
+      }
+    }
+    else {
+      if (friendlyError) {
+        console.log('Initiative hasn\'t been rolled');
+        response.send('Initiative hasn\'t been rolled!');
       }
       else {
         response.sendStatus(400);
@@ -221,19 +251,29 @@ var rpg = {
     console.log('"' + command + '" requested')
     switch (command) {
     case this.cmdAddParty:
-      this.handleAddToParty(args, response, respondWith);
+      this.handleAdd(true, args, response, respondWith);
       break;
     case this.cmdGetParty:
-      this.handleGetParty(response, respondWith);
+      this.handleGet(true, response, respondWith);
       break;
-    case this.cmdClrParty:
-      this.handleClearParty(response, respondWith);
+    case this.cmdClearParty:
+      this.handleClear(true, response, respondWith);
+      break;
+    case this.cmdAddMonsters:
+      this.handleAdd(false, args, response, respondWith);
+      break;
+    case this.cmdGetMonsters:
+      this.handleGet(false, response, respondWith);
+      break;
+    case this.cmdClearMonsters:
+      this.handleClear(false, response, respondWith);
       break;
     case this.cmdRollInit:
-      this.handleInitiative(true, response, respondWith, friendlyError);
+      this.handleRollInitiative(response, respondWith, friendlyError);
       break;
-    case this.cmdNextTurn:
-      this.handleInitiative(false, response, respondWith, friendlyError);
+      break;
+    case this.cmdGetInit:
+      this.handleGetInitiative(response, respondWith, friendlyError);
       break;
     default:
       if (friendlyError) {
