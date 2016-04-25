@@ -12,7 +12,7 @@ var dice = {
       rolls.push(roll);
       total += roll;
     }
-    rolls['total'] = total+add;
+    rolls.sort(function(a, b){return b-a;});
   
     var text = count + 'd' + die;
     if (add) {
