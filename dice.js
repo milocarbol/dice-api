@@ -2,8 +2,8 @@ var constants = require('./constants.js');
 
 var dice = {
   
-  roll : function(count, die, add) {
-    console.log('Rolling ' + count + 'd' + die + '+' + add);
+  roll : function(count, die, operator, mod) {
+    console.log('Rolling ' + count + 'd' + die + '' + operator + '' + mod);
   
     var rolls = [];
     var total = 0;
@@ -15,14 +15,21 @@ var dice = {
     rolls.sort(function(a, b){return b-a;});
   
     var text = count + 'd' + die;
-    if (add) {
-      text += '+' + add;
+    if (mod) {
+      text += operator + mod;
     }
-  
+    
+    if (operator == '-') {
+      total -= mod;
+    }
+    else {
+      total += mod;
+    }
+    
     return {
       'text': text,
       'rolls': rolls,
-      'total': total + add
+      'total': total
     };
   },
 
@@ -31,14 +38,19 @@ var dice = {
   
     var split1 = roll.split('d');
     var count = split1[0] || 1;
-    var dieAndAdd = split1[1].split('+');
-    var die = dieAndAdd[0];
-    var add = dieAndAdd[1] || 0;
+    var operator = '+';
+    if (split1[1].indexOf('-') > 0) {
+      operator = '-';
+    }
+    var dieAndMod = split1[1].split(/\+|-/);
+    var die = dieAndMod[0];
+    var mod = dieAndMod[1] || 0;
   
     return {
       'count': parseInt(count),
       'die': parseInt(die),
-      'add': parseInt(add)
+      'operator': operator,
+      'mod': parseInt(mod)
     };
   },
 
@@ -54,7 +66,7 @@ var dice = {
     var text = request.query.text;
     if (constants.notation.test(text)) {
       var parsedRoll = this.parseText(text);
-      var result = this.roll(parsedRoll.count, parsedRoll.die, parsedRoll.add);
+      var result = this.roll(parsedRoll.count, parsedRoll.die, parsedRoll.operator, parsedRoll.mod);
     
       switch (respondWith) {
       case constants.respondWithJson:
