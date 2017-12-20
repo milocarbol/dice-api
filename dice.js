@@ -4,7 +4,9 @@ var dice = {
   
   roll : function(count, die, operator, mod) {
     console.log('Rolling ' + count + 'd' + die + '' + operator + '' + mod);
-  
+    
+    var isCrit = false;
+    
     var rolls = [];
     var total = 0;
     for (var i = 0; i < count; i++) {
@@ -13,6 +15,10 @@ var dice = {
       total += roll;
     }
     rolls.sort(function(a, b){return b-a;});
+    
+    if (count == 1 && die == 20 && rolls[0] == 20) {
+      isCrit = true;
+    }
   
     var text = count + 'd' + die;
     if (mod) {
@@ -29,7 +35,8 @@ var dice = {
     return {
       'text': text,
       'rolls': rolls,
-      'total': total
+      'total': total,
+      'isCrit': isCrit
     };
   },
 
@@ -58,6 +65,11 @@ var dice = {
     var text = result.text + ': ' + result.total;
     if (result.rolls.length > 1) {
       text += ' (' + result.rolls.join(', ') + ')';
+    }
+    else {
+      if (result.isCrit) {
+        text += ' ' + constants.critText;
+      }
     }
     return text;
   },
