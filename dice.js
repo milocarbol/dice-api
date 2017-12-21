@@ -60,7 +60,7 @@ var dice = {
   
   postProcess : function(result, requestInput) {
     console.log('Post-processing...');
-    if (requestInput.user_name == 'yharamati') {
+    if (requestInput.user_name == 'yharamati' && Math.floor(Math.random() * 4) == 0) {
       if (result.count == 1 && result.die == 20) {
         console.log('Returning walnuts instead.');
         return {
