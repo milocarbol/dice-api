@@ -5,7 +5,7 @@ var dice = {
   handle : function(request, response) {
     console.log('Received request: ' + JSON.stringify(request.query));
     var text = request.query.text;
-    if (constants.notation.test(text)) {
+    if (parser.isValidInput(text)) {
       var parsedRoll = parser.parseText(text);
       var result = this.roll(parsedRoll.count, parsedRoll.die, parsedRoll.operator, parsedRoll.mod);
       var postProcessData = this.postProcess(result, request.query);
