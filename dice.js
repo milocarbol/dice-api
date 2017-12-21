@@ -15,10 +15,6 @@ var dice = {
       total += roll;
     }
     rolls.sort(function(a, b){return b-a;});
-    
-    if (count == 1 && die == 20 && rolls[0] == 20) {
-      isCrit = true;
-    }
   
     var text = count + 'd' + die;
     if (mod) {
@@ -34,10 +30,39 @@ var dice = {
     
     return {
       'text': text,
+      'count': count,
+      'die': die,
+      'operator': operator,
+      'mod': mod,
       'rolls': rolls,
-      'total': total,
-      'isCrit': isCrit
+      'total': total
     };
+  },
+  
+  postProcess : function(result, request) {
+    console.log('Post-processing...');
+    if (request.query.user_id == 'milo') {
+      if (result.count == 1 && result.die == 20) {
+        console.log('Returning walnuts instead.');
+        return {
+          'doCustom': true,
+          'responseType': constants.walnutResponse
+        };
+      }
+    }
+    else if (result.count == 1 && result.die == 20 && result.rolls[0] == 20) {
+      console.log('Returning crit response.');
+      return {
+        'doCustom': true,
+        'responseType': constants.critResponse
+      };
+    }
+    else {
+      console.log('No post-processing required.');
+      return {
+        'doCustom': false
+      };
+    }
   },
 
   parseText : function(roll) {
@@ -61,46 +86,35 @@ var dice = {
     };
   },
 
-  friendlyText : function(result) {
+  friendlyText : function(result, postProcessData) {
     var text = result.text + ': ' + result.total;
     if (result.rolls.length > 1) {
       text += ' (' + result.rolls.join(', ') + ')';
     }
-    else {
-      if (result.isCrit) {
+    if (postProcessData.doCustom) {
+      if (postProcessData.responseType == constants.walnutResponse) {
+        text = 'walnut';
+      }
+      else if (postProcessData.responseType == constants.critResponse) {
         text += ' ' + constants.critText;
       }
     }
     return text;
   },
 
-  handle : function(request, response, respondWith, friendlyError) {
+  handle : function(request, response) {
     var text = request.query.text;
     if (constants.notation.test(text)) {
       var parsedRoll = this.parseText(text);
       var result = this.roll(parsedRoll.count, parsedRoll.die, parsedRoll.operator, parsedRoll.mod);
-    
-      switch (respondWith) {
-      case constants.respondWithJson:
-        response.json(result);
-        break;
-      case constants.respondToSlack:
-        response.json({
-          'response_type': 'in_channel',
-          'text': this.friendlyText(result)
-        });
-        break;
-      case constants.respondWithText:
-        response.send(this.friendlyText(result));
-      }
+      var postProcessData = this.postProcess(result, request);
+      response.json({
+        'response_type': 'in_channel',
+        'text': this.friendlyText(result, postProcessData)
+      });
     }
     else {
-      if (friendlyError) {
-        response.send('"' + text + '" is not valid dice notation.');
-      }
-      else {
-        response.sendStatus(400);
-      }
+      response.send('"' + text + '" is not valid dice notation.');
     }
   }
 };
