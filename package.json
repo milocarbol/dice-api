@@ -1,13 +1,13 @@
 {
   "name": "rpg-api",
-  "version": "0.1.5",
-  "description": "An API that does RPG things",
+  "version": "1.0.0",
+  "description": "Rolls dice for RPGs",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
   },
   "dependencies": {
-    "ejs": "2.3.3",
+    "ejs": "2.5.5",
     "express": "4.13.3"
   },
   "engines": {
