@@ -103,6 +103,7 @@ var dice = {
   },
 
   handle : function(request, response) {
+    console.log('Received request: ' + JSON.stringify(request.query));
     var text = request.query.text;
     if (constants.notation.test(text)) {
       var parsedRoll = this.parseText(text);
