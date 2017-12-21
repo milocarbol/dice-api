@@ -41,7 +41,7 @@ var dice = {
   
   postProcess : function(result, request) {
     console.log('Post-processing...');
-    if (request.query.user_id == 'milo') {
+    if (request.query.user_name == 'milo') {
       if (result.count == 1 && result.die == 20) {
         console.log('Returning walnuts instead.');
         return {
@@ -93,7 +93,7 @@ var dice = {
     }
     if (postProcessData.doCustom) {
       if (postProcessData.responseType == constants.walnutResponse) {
-        text = 'walnut';
+        text = constants.walnutText;
       }
       else if (postProcessData.responseType == constants.critResponse) {
         text += ' ' + constants.critText;
