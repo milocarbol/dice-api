@@ -44,6 +44,9 @@ var parser = {
       else if (postProcessData.responseType == constants.critResponse) {
         text += ' ' + constants.critText;
       }
+      else if (postProcessData.responseType == constants.critFailResponse) {
+        text += ' ' + constants.critFailText;
+      }
     }
     return text;
   },

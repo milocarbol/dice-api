@@ -60,7 +60,7 @@ var dice = {
   
   postProcess : function(result, requestInput) {
     console.log('Post-processing...');
-    if (requestInput.user_name == 'yharamati' && Math.floor(Math.random() * 4) == 0) {
+    /*if (requestInput.user_name == 'yharamati' && Math.floor(Math.random() * 4) == 0) {
       if (result.count == 1 && result.die == 20) {
         console.log('Returning walnuts instead.');
         return {
@@ -69,12 +69,19 @@ var dice = {
         };
       }
     }
-    else if (result.count == 1 && result.die == 20 && result.rolls[0] == 20) {
+    else */if (result.count == 1 && result.die == 20 && result.rolls[0] == 20) {
       console.log('Returning crit response.');
       return {
         'doCustom': true,
         'responseType': constants.critResponse
       };
+    }
+    else if (result.count == 1 && result.die == 20 && result.rolls[0] == 1) {
+      console.log('Returning crit fail response.');
+      return {
+        'doCustom': true,
+        'responseType': constants.critFailResponse
+      }
     }
     else {
       console.log('No post-processing required.');
