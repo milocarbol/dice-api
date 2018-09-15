@@ -7,7 +7,7 @@ var dice = {
     var text = request.query.text;
     if (parser.isValidInput(text)) {
       var parsedRoll = parser.parseText(text);
-      var result = this.roll(parsedRoll.count, parsedRoll.die, parsedRoll.operator, parsedRoll.mod);
+      var result = this.roll(parsedRoll.count, parsedRoll.die, parsedRoll.operator, parsedRoll.mod, parsedRoll.unordered);
       var postProcessData = this.postProcess(result, request.query);
       response.json({
         'response_type': 'in_channel',
@@ -19,7 +19,7 @@ var dice = {
     }
   },
   
-  roll : function(count, die, operator, mod) {
+  roll : function(count, die, operator, mod, unordered) {
     console.log('Rolling ' + count + 'd' + die + '' + operator + '' + mod);
     
     var rolls = [];
@@ -29,11 +29,13 @@ var dice = {
       rolls.push(roll);
       total += roll;
     }
-    rolls.sort(
-      function(a, b) {
-        return b - a;
-      }
-    );
+    if (!unordered) {
+      rolls.sort(
+        function(a, b) {
+          return b - a;
+        }
+      );
+    }
   
     var text = count + 'd' + die;
     if (mod) {

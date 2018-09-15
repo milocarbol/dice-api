@@ -5,21 +5,24 @@ var parser = {
     console.log('Parsing ' + roll);
     
     if (roll) {
-      var split1 = roll.split('d');
-      var count = split1[0] || 1;
-      var operator = '+';
-      if (split1[1].indexOf('-') > 0) {
-        operator = '-';
-      }
-      var dieAndMod = split1[1].split(/\+|-/);
-      var die = dieAndMod[0];
-      var mod = dieAndMod[1] || 0;
-  
+      var parsedRoll = roll.match(constants.notation);
+      var count = parsedRoll[constants.diceCountIndex] || 1;
+      var die = parsedRoll[constants.dieTypeIndex];
+      var operator = parsedRoll[constants.operatorIndex] || '+';
+      var mod = parsedRoll[constants.modifierIndex] || 0;
+      var unordered = parsedRoll[constants.unorderedFlagIndex].trim() === 'u';
+      console.log('Parsed: ' + parsedRoll);
+      console.log('\tCount: ' + count);
+      console.log('\tDie: ' + die);
+      console.log('\tOperator: ' + operator);
+      console.log('\tModifier: ' + mod);
+      console.log('\tUnordered: ' + unordered);
       return {
         'count': parseInt(count),
         'die': parseInt(die),
         'operator': operator,
-        'mod': parseInt(mod)
+        'mod': parseInt(mod),
+        'unordered': unordered
       };
     }
     else {
@@ -27,7 +30,8 @@ var parser = {
         'count': 1,
         'die': 20,
         'operator': '+',
-        'mod': 0
+        'mod': 0,
+        'unordered': false
       }
     }
   },
