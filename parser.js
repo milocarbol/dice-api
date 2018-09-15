@@ -10,7 +10,7 @@ var parser = {
       var die = parsedRoll[constants.dieTypeIndex];
       var operator = parsedRoll[constants.operatorIndex] || '+';
       var mod = parsedRoll[constants.modifierIndex] || 0;
-      var unordered = parsedRoll[constants.unorderedFlagIndex].trim() === 'u';
+      var unordered = parsedRoll[constants.unorderedFlagIndex] === ' u';
       console.log('Parsed: ' + parsedRoll);
       console.log('\tCount: ' + count);
       console.log('\tDie: ' + die);
