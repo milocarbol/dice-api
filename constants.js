@@ -1,5 +1,5 @@
 var constants = {
-  notation: /^(\d*)d(\d+)((([\+-])(\d+))| u)?$/,
+  notation: /^(\d*)d(\d+)((([\+-])(\d+))|u)?$/,
   diceCountIndex: 1,
   dieTypeIndex: 2,
   unorderedFlagIndex: 3,
