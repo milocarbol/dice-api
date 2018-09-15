@@ -56,7 +56,8 @@ var dice = {
       'operator': operator,
       'mod': mod,
       'rolls': rolls,
-      'total': total
+      'total': total,
+      'unordered': unordered
     };
   },
   

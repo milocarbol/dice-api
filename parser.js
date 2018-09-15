@@ -37,9 +37,13 @@ var parser = {
   },
   
   toText : function(result, postProcessData) {
-    var text = result.text + ': ' + result.total;
-    if (result.rolls.length > 1) {
-      text += ' (' + result.rolls.join(', ') + ')';
+    var text = result.text + ': ';
+    if (!result.unordered && result.rolls.length > 1) {
+      text += result.total + ' (';
+    }
+    text += result.rolls.join(', ');
+    if (!result.unordered && result.rolls.length > 1) {
+      text += ')';
     }
     if (postProcessData.doCustom) {
       if (postProcessData.responseType == constants.walnutResponse) {
