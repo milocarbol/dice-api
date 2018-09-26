@@ -38,11 +38,15 @@ var parser = {
   
   toText : function(result, postProcessData) {
     var text = result.text + ': ';
-    if (!result.unordered && result.rolls.length > 1) {
-      text += result.total + ' (';
+    if (result.rolls.length == 1) {
+      text += result.total;
     }
-    text += result.rolls.join(', ');
-    if (!result.unordered && result.rolls.length > 1) {
+    else if (result.unordered) {
+      text += result.rolls.join(', ');
+    }
+    else if (!result.unordered) {
+      text += result.total + ' (';
+      text += result.rolls.join(', ');
       text += ')';
     }
     if (postProcessData.doCustom) {
